@@ -1,0 +1,83 @@
+364. 加权嵌套序列和 II
+给一个嵌套整数序列，请你返回每个数字在序列中的加权和，它们的权重由它们的深度决定。
+
+序列中的每一个元素要么是一个整数，要么是一个序列（这个序列中的每个元素也同样是整数或序列）。
+
+与 前一个问题 不同的是，前一题的权重按照从根到叶逐一增加，而本题的权重从叶到根逐一增加。
+
+也就是说，在本题中，叶子的权重为1，而根拥有最大的权重。
+
+示例 1:
+
+输入: [[1,1],2,[1,1]]
+输出: 8
+解释: 四个 1 在深度为 1 的位置， 一个 2 在深度为 2 的位置。
+示例 2:
+
+输入: [1,[4,[6]]]
+输出: 17
+解释: 一个 1 在深度为 3 的位置， 一个 4 在深度为 2 的位置，一个 6 在深度为 1 的位置。 1*3 + 4*2 + 6*1 = 17。
+
+
+
+/**
+ * // This is the interface that allows for creating nested lists.
+ * // You should not implement it, or speculate about its implementation
+ * public interface NestedInteger {
+ *     // Constructor initializes an empty nested list.
+ *     public NestedInteger();
+ *
+ *     // Constructor initializes a single integer.
+ *     public NestedInteger(int value);
+ *
+ *     // @return true if this NestedInteger holds a single integer, rather than a nested list.
+ *     public boolean isInteger();
+ *
+ *     // @return the single integer that this NestedInteger holds, if it holds a single integer
+ *     // Return null if this NestedInteger holds a nested list
+ *     public Integer getInteger();
+ *
+ *     // Set this NestedInteger to hold a single integer.
+ *     public void setInteger(int value);
+ *
+ *     // Set this NestedInteger to hold a nested list and adds a nested integer to it.
+ *     public void add(NestedInteger ni);
+ *
+ *     // @return the nested list that this NestedInteger holds, if it holds a nested list
+ *     // Return null if this NestedInteger holds a single integer
+ *     public List<NestedInteger> getList();
+ * }
+ */
+class Solution {
+    public int depthSumInverse(List<NestedInteger> nestedList) {
+        if (nestedList == null || nestedList.size() == 0) {
+            return 0;
+        }
+        Queue<NestedInteger> queue = new LinkedList<>();
+        Stack<Integer> stack = new Stack<>();
+        for (NestedInteger nI : nestedList) {
+            queue.offer(nI);
+        }
+        while (!queue.isEmpty()) {
+            int len = queue.size();
+            int sum = 0;
+            for (int i = 0; i < len; i++) {
+                NestedInteger n = queue.poll();
+                if (n.isInteger()) {
+                    sum += n.getInteger();
+                } else {
+                    for (NestedInteger nI : n.getList()) {
+                        queue.offer(nI);
+                    }
+                }
+            }
+            stack.push(sum);
+        }
+        int res = 0;
+        int num = 1;
+        while (!stack.isEmpty()) {
+            res += stack.pop() * (num++);
+        }
+        return res;
+    }
+}
